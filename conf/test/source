@@ -1,0 +1,3 @@
+#SAMPLE svn command
+SOURCE="svn export --force -r $REVISON https://akayami.com/svn/spl/$BRANCH $SOURCE_DIR";
+DESTINATION="tomasz@localhost"
