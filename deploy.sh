@@ -53,7 +53,15 @@ for DEST in "${SERVERS[@]}"
 do
 	ssh $DEST mkdir -p $REMOTE_PATH
 	scp $FILE $DEST:$REMOTE_PATH
-	#ssh $DEST "cd $REMOTE_PATH ; ls -al;"
 	ssh $DEST "cd $REMOTE_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
 	echo "-- $DEST"
 done
+
+if [ ! -z "$EMAIL_LIST" ]
+then
+	echo "Email: $EMAIL_LIST";
+	EMAIL_MESSAGE="Deployment Completed For: $PROJECT_NAME - $ENV_NAME - $VERSION_NAME\n\n\n----"
+
+	echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" "$EMAIL_LIST" -- -f tomasz.rakowski@manwin.com
+	
+fi

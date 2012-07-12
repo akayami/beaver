@@ -66,8 +66,7 @@ if $DEPLOY ; then
 fi
 
 if $FLIP ; then
-	echo "Flipping";
-	
+	echo "Flipping";	
 	ssh $DESTINATION $FLIP_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME;
 fi
 #rm -rf $WORK_DIR; 
