@@ -10,12 +10,13 @@ VERSION_NAME=""
 ENV_NAME="dev"
 BRANCH="trunk"
 REVISION="head"
-ARCHIVE_COMMAND="deploy.sh"
-DEPLOY_COMMAND="deploy.sh"
-FLIP_COMMAND="flip.sh"
+ARCHIVE_COMMAND="bvrdpl.sh"
+DEPLOY_COMMAND="bvrdpl.sh"
+FLIP_COMMAND="bvrflip.sh"
 DEPLOY=false
 FLIP=false
-
+OVERWRITE=false
+BUILD=true
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
@@ -25,7 +26,7 @@ then
                             # Note: dash (-) necessary
 fi
 
-while getopts ":p:b:v:c:r:e:df" Option
+while getopts ":p:b:v:c:r:e:dfR" Option
 do
 	case $Option in
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
@@ -41,6 +42,7 @@ do
 		e	) echo "-Enviorment ${OPTARG}"; ENV_NAME=${OPTARG};;
 		d	) echo "-Exceute Deploy"; DEPLOY=true;;
 		f	) echo "-Execute Flip"; FLIP=true;;
+		R	) echo "-Overwrite archived package"; OVERWRITE=true;;
 	esac
 done
 
@@ -48,22 +50,33 @@ mkdir -p $SOURCE_DIR;
 
 source $CONFIG_LOCATION/$PROJECT_NAME/source;
 
+echo "Rev: $REVISION"
+
+DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -d`;
+
+DESTINATION_DIR=$DESTINATION_ARCHIVE/$PROJECT_NAME/$VERSION_NAME;
 
 
-if $DEPLOY ; then
-	echo "Rev: $REVISION"
+EXIST=`ssh $DESTINATION test -d $DESTINATION_DIR || echo "0"`;
+#EXIST=`ssh $DESTINATION ls -al $DESTINATION_DIR | wc -l`;
+if [ "$EXIST" != "0" ]
+then
+	if ! $OVERWRITE ; then
+		BUILD=false;
+		echo "Project already archived, skipping pushing...";			
+	fi	
+fi
+if $BUILD ; then
 	echo $SOURCE;
 	eval $SOURCE;
 	cd $SOURCE_DIR;
 	
-	tar zcvf ../package.tgz *;
-	
-	DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -d`;
-	
-	DESTINATION_DIR=$DESTINATION_ARCHIVE/$PROJECT_NAME/$VERSION_NAME;
-	
+	tar zcvf ../package.tgz *;		
+		
 	ssh $DESTINATION mkdir -p $DESTINATION_DIR
 	scp $WORK_DIR/package.tgz $DESTINATION:$DESTINATION_DIR
+fi
+if $DEPLOY ; then	
 	echo "Deploying"; 
 	DEP_COMM="ssh $DESTINATION $DEPLOY_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME"
 	eval $DEP_COMM;
@@ -73,4 +86,4 @@ if $FLIP ; then
 	echo "Flipping";	
 	ssh $DESTINATION $FLIP_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME;
 fi
-#rm -rf $WORK_DIR; 
+rm -rf $WORK_DIR; 
