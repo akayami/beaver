@@ -53,6 +53,13 @@ fi
 for DEST in "${SERVERS[@]}"
 do
 	ssh $DEST "cd $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/ ; rm current; ln -s $VERSION_NAME current;"
+	
+	FILE=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current/post-flip.sh
+	EXIST=`ssh $DEST test -d $FILE || echo "NA"`;
+	if [ "$EXIST" != "NA" ] ; then
+		echo "-Executing Post-Flip";
+		ssh $DEST "bash $FILE"
+	fi	
 	echo "-- $DEST"
 done
 
