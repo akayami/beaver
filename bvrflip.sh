@@ -60,6 +60,8 @@ do
 	if [ "$EXIST" != "NA" ] ; then
 		echo "-Executing Post-Flip";
 		ssh $DEST "bash $FILE $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current/"
+	else
+		echo "-Skipping Post-Flip: $EXIST - $FILE"
 	fi
 	
 	
