@@ -50,13 +50,6 @@ if $STOP ; then
 	exit 0;
 fi
 
-if [ ! -e $REMOTE_PATH ]
-then
-	echo "Requested version not found: $REMOTE_PATH";
-	echo "Try deploying first";
-	exit 0;
-fi
-
 for DEST in "${SERVERS[@]}"
 do
 	ssh $DEST "cd $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/ ; rm current; ln -s $VERSION_NAME current;"
