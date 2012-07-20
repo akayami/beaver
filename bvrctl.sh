@@ -18,6 +18,7 @@ FLIP=false
 OVERWRITE=false
 BUILD=true
 REMOTE_ARCHIVE_HOOK=""
+MESSAGE=""
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
@@ -27,7 +28,7 @@ then
                             # Note: dash (-) necessary
 fi
 
-while getopts ":p:b:v:c:r:e:dfR" Option
+while getopts ":p:b:v:c:r:e:dfRm:" Option
 do
 	case $Option in
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
@@ -44,6 +45,7 @@ do
 		d	) echo "-Exceute Deploy"; DEPLOY=true;;
 		f	) echo "-Execute Flip"; FLIP=true;;
 		R	) echo "-Overwrite archived package"; OVERWRITE=true;;
+		m	) echo "-Message: ${OPTARG}"; MESSAGE=${OPTARG};;
 	esac
 done
 
@@ -91,4 +93,4 @@ if $FLIP ; then
 	echo "Flipping";	
 	ssh $DESTINATION $FLIP_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME;
 fi
-#rm -rf $WORK_DIR; 
+rm -rf $WORK_DIR; 
