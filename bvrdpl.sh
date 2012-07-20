@@ -8,6 +8,7 @@ ENV_NAME=""
 TARGET="/var/beaver/archive"
 CONFIG_LOCATION="/etc/beaver/servers"
 SERVER_DEPLOY_TMP_HOME="/tmp/$PID"
+OVERWRITE=false
 
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
@@ -17,7 +18,7 @@ then
                             # Usage: scriptname -options
                             # Note: dash (-) necessary
 fi
-while getopts ":dp:v:e:c:" Option
+while getopts ":dp:v:e:c:R:" Option
 do
 	case $Option in
 		d	) echo $TARGET; exit;;
@@ -25,6 +26,7 @@ do
 		c   ) echo "-Config Dir:${OPTARG}"; CONFIG_LOCATION=${OPTARG};;
 		v	) echo "-Version ${OPTARG}"; VERSION_NAME=${OPTARG};;
 		e	) echo "-Enviorment ${OPTARG}"; ENV_NAME=${OPTARG};;
+		R	) echo "-Overwrite destination package"; OVERWRITE=${OPTARG};;
 	esac
 done
 
@@ -58,11 +60,16 @@ REMOTE_TMP_PATH="$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/tmp_${PID}_$VERSION
 
 for DEST in "${SERVERS[@]}"
 do
-	echo "-- Trying $DEST"
-	ssh $DEST mkdir -p $REMOTE_TMP_PATH
-	scp $FILE $DEST:$REMOTE_TMP_PATH
-	ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
-	ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH"
+	echo "-- Trying to deploy to: $DEST"
+	EXIST=`ssh $DEST test -d $REMOTE_PATH || echo "NA"`;
+	if [ "$EXIST" = "NA" -o "$OVERWRITE" eq "true"  ] ; then		
+		ssh $DEST mkdir -p $REMOTE_TMP_PATH
+		scp $FILE $DEST:$REMOTE_TMP_PATH
+		ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
+		ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH; echo $VERSION_NAME > $REMOTE_PATH/version.txt;"		
+	else
+		echo "This version is already deployed here. Execute with overwrite option";	
+	fi
 	echo "-- Done $DEST"
 done
 
