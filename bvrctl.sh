@@ -17,6 +17,7 @@ DEPLOY=false
 FLIP=false
 OVERWRITE=false
 BUILD=true
+REMOTE_ARCHIVE_HOOK=""
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
@@ -67,12 +68,16 @@ then
 	fi	
 fi
 if $BUILD ; then
+	# Building off github archive, while leaving a new tag
 	echo $SOURCE;
 	eval $SOURCE;
-	cd $SOURCE_DIR;
-	
+	if [ ! -z "REMOTE_ARCHIVE_HOOK" ]; then
+		echo "-Tagging repo"
+		cd $SOURCE_DIR;
+		eval $REMOTE_ARCHIVE_HOOK;	
+	fi	
+	cd $SOURCE_DIR;		
 	tar zcvf ../package.tgz *;		
-		
 	ssh $DESTINATION mkdir -p $DESTINATION_DIR
 	scp $WORK_DIR/package.tgz $DESTINATION:$DESTINATION_DIR
 fi
@@ -86,4 +91,4 @@ if $FLIP ; then
 	echo "Flipping";	
 	ssh $DESTINATION $FLIP_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME;
 fi
-rm -rf $WORK_DIR; 
+#rm -rf $WORK_DIR; 

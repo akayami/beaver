@@ -1,0 +1,6 @@
+# Sample git hub command
+# Here, we're using ssh, with perviously setup key.
+SOURCE="git clone git@github.com:akayami/beaver.git $SOURCE_DIR; cd $SOURCE_DIR; git checkout -b $BRANCH $REVISION"
+DESTINATION="tomasz@localhost"
+# The following command is a hook that will push the created tag into github.
+REMOTE_ARCHIVE_HOOK="git tag $VERSION_NAME; git push --tags"
