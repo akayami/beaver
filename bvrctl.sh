@@ -86,6 +86,7 @@ fi
 if $DEPLOY ; then	
 	echo "Deploying"; 
 	DEP_COMM="ssh $DESTINATION $DEPLOY_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME"
+	echo $DEP_COMM;
 	eval $DEP_COMM;
 fi
 

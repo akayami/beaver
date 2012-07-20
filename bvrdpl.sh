@@ -34,6 +34,8 @@ if [ ! -e $FILE ]
 then 
 	echo "Could not find archive: $FILE";
 	exit $E_OPTERROR;
+else
+	echo "File Found !";
 fi
 
 CONFIG=$CONFIG_LOCATION/$PROJECT_NAME/$ENV_NAME/servers
@@ -42,6 +44,8 @@ if [ ! -e $CONFIG ]
 then 
 	echo "Could not find enviorment: $CONFIG";
 	exit $E_OPTERROR;
+else
+	echo "Config Found !"
 fi
 
 source $CONFIG;
@@ -50,22 +54,23 @@ source $CONFIG;
 
 REMOTE_PATH=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME
 
-REMOTE_TMP_PATH=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/tmp_$PID_$VERSION_NAME
+REMOTE_TMP_PATH="$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/tmp_${PID}_$VERSION_NAME/"
 
 for DEST in "${SERVERS[@]}"
 do
+	echo "-- Trying $DEST"
 	ssh $DEST mkdir -p $REMOTE_TMP_PATH
 	scp $FILE $DEST:$REMOTE_TMP_PATH
 	ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
 	ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH"
-	echo "-- $DEST"
+	echo "-- Done $DEST"
 done
 
 if [ ! -z "$EMAIL_LIST" ]
 then
 	echo "Email: $EMAIL_LIST";
 	EMAIL_MESSAGE="Deployment Completed For: $PROJECT_NAME - $ENV_NAME - $VERSION_NAME\n\n\n----"
-
-	echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" "$EMAIL_LIST" -- -f tomasz.rakowski@manwin.com
+	echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" "$EMAIL_LIST"
+	#echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" "$EMAIL_LIST" -- -f tomasz.rakowski@manwin.com
 	
 fi

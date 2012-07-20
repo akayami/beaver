@@ -72,7 +72,8 @@ if [ ! -z "$EMAIL_LIST" ]
 then
 	echo "Email: $EMAIL_LIST";
 	EMAIL_MESSAGE="Flip Completed For: $PROJECT_NAME - $ENV_NAME - $VERSION_NAME\n\n\n----"
-	echo -e $EMAIL_MESSAGE | mail -s "Flip Completed - Beaver Deployment Tool" "$EMAIL_LIST" -- -f tomasz.rakowski@manwin.com	
+	echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" "$EMAIL_LIST"
+	#echo -e $EMAIL_MESSAGE | mail -s "Flip Completed - Beaver Deployment Tool" "$EMAIL_LIST" -- -f tomasz.rakowski@manwin.com	
 fi
 
 echo "Flip completed on all servers";
