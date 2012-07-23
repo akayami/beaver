@@ -19,16 +19,18 @@ OVERWRITE=false
 BUILD=true
 REMOTE_ARCHIVE_HOOK=""
 MESSAGE=""
+STATUS=false;
+ARCHIVED=false;
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
-  echo "Usage: `basename $0` options (-pv)"
-  exit $E_OPTERROR          # Exit and explain usage.
+	echo "Usage: `basename $0` options (-pv)"
+	exit $E_OPTERROR          # Exit and explain usage.
                             # Usage: scriptname -options
                             # Note: dash (-) necessary
 fi
 
-while getopts ":p:b:v:c:r:e:dfRm:" Option
+while getopts ":p:b:v:c:r:e:dfRm:sa" Option
 do
 	case $Option in
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
@@ -46,8 +48,18 @@ do
 		f	) echo "-Execute Flip"; FLIP=true;;
 		R	) echo "-Overwrite archived package"; OVERWRITE=true;;
 		m	) echo "-Message: ${OPTARG}"; MESSAGE=${OPTARG};;
+		s	) echo "-Show Status"; STATUS=true;;
+		a	) echo "-Show Archived List"; ARCHIVED=true;;
 	esac
 done
+
+EXIST=`test -d $CONFIG_LOCATION/$PROJECT_NAME || echo "false"`;
+
+if [ -z "$PROJECT_NAME" -o "$EXIST" = "false" ]; then
+	echo "Project name not provided or invalid. List of projects configured:"
+	ls  $CONFIG_LOCATION;
+	exit 0;
+fi
 
 mkdir -p $SOURCE_DIR;
 
@@ -55,12 +67,21 @@ source $CONFIG_LOCATION/$PROJECT_NAME/source;
 
 echo "Rev: $REVISION"
 
-DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -d`;
+DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -t`;
 
 DESTINATION_DIR=$DESTINATION_ARCHIVE/$PROJECT_NAME/$VERSION_NAME;
 
+if [ "$ARCHIVED" = "true" ]; then
+	ssh $DESTINATION ls $DESTINATION_ARCHIVE/$PROJECT_NAME;
+fi
+
+if [ -z "$VERSION_NAME" ]; then
+	echo "Missing Version Name: You need to at least specify revision, or version";
+	exit 0;
+fi
 
 EXIST=`ssh $DESTINATION test -d $DESTINATION_DIR || echo "0"`;
+
 #EXIST=`ssh $DESTINATION ls -al $DESTINATION_DIR | wc -l`;
 if [ "$EXIST" != "0" ]
 then
@@ -73,12 +94,12 @@ if $BUILD ; then
 	# Building off github archive, while leaving a new tag
 	echo $SOURCE;
 	eval $SOURCE;
-	if [ ! -z "REMOTE_ARCHIVE_HOOK" ]; then
-		echo "-Tagging repo"
+	if [ ! -z "$REMOTE_ARCHIVE_HOOK" ]; then
+		echo "-Tagging repo";
 		cd $SOURCE_DIR;
 		eval $REMOTE_ARCHIVE_HOOK;	
 	fi	
-	cd $SOURCE_DIR;		
+	cd $SOURCE_DIR;			
 	tar zcvf ../package.tgz *;		
 	ssh $DESTINATION mkdir -p $DESTINATION_DIR
 	scp $WORK_DIR/package.tgz $DESTINATION:$DESTINATION_DIR
@@ -94,4 +115,10 @@ if $FLIP ; then
 	echo "Flipping";	
 	ssh $DESTINATION $FLIP_COMMAND -p $PROJECT_NAME -v $VERSION_NAME -e $ENV_NAME;
 fi
+
+if $STATUS ; then
+	echo "Displaying Status:";
+	ssh $DESTINATION bvrstat.sh -p $PROJECT_NAME -e $ENV_NAME;
+fi
+
 rm -rf $WORK_DIR; 

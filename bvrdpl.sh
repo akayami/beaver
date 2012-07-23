@@ -18,10 +18,10 @@ then
                             # Usage: scriptname -options
                             # Note: dash (-) necessary
 fi
-while getopts ":dp:v:e:c:R:" Option
+while getopts ":tp:v:e:c:R:" Option
 do
 	case $Option in
-		d	) echo $TARGET; exit;;
+		t	) echo $TARGET; exit;;
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
 		c   ) echo "-Config Dir:${OPTARG}"; CONFIG_LOCATION=${OPTARG};;
 		v	) echo "-Version ${OPTARG}"; VERSION_NAME=${OPTARG};;
@@ -62,7 +62,7 @@ for DEST in "${SERVERS[@]}"
 do
 	echo "-- Trying to deploy to: $DEST"
 	EXIST=`ssh $DEST test -d $REMOTE_PATH || echo "NA"`;
-	if [ "$EXIST" = "NA" -o "$OVERWRITE" eq "true"  ] ; then		
+	if [ "$EXIST" = "NA" -o "$OVERWRITE"="true"  ] ; then		
 		ssh $DEST mkdir -p $REMOTE_TMP_PATH
 		scp $FILE $DEST:$REMOTE_TMP_PATH
 		ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
