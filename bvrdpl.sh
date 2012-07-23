@@ -9,7 +9,7 @@ TARGET="/var/beaver/archive"
 CONFIG_LOCATION="/etc/beaver/servers"
 SERVER_DEPLOY_TMP_HOME="/tmp/$PID"
 OVERWRITE=false
-
+ENV_NAME_CONFIG=""
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
@@ -25,7 +25,7 @@ do
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
 		c   ) echo "-Config Dir:${OPTARG}"; CONFIG_LOCATION=${OPTARG};;
 		v	) echo "-Version ${OPTARG}"; VERSION_NAME=${OPTARG};;
-		e	) echo "-Enviorment ${OPTARG}"; ENV_NAME=${OPTARG};;
+		e	) echo "-Enviorment ${OPTARG}"; ENV_NAME=${OPTARG}; ENV_NAME_CONFIG=${OPTARG};;
 		R	) echo "-Overwrite destination package"; OVERWRITE=${OPTARG};;
 	esac
 done
@@ -66,7 +66,7 @@ do
 		ssh $DEST mkdir -p $REMOTE_TMP_PATH
 		scp $FILE $DEST:$REMOTE_TMP_PATH
 		ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
-		ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH; echo $VERSION_NAME > $REMOTE_PATH/version.txt;"		
+		ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH; echo $VERSION_NAME > $REMOTE_PATH/version.txt; cd $REMOTE_PATH; bash post-deploy.sh $ENV_NAME_CONFIG";
 	else
 		echo "This version is already deployed here. Execute with overwrite option";	
 	fi
