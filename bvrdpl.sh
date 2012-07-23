@@ -66,7 +66,7 @@ do
 		ssh $DEST mkdir -p $REMOTE_TMP_PATH
 		scp $FILE $DEST:$REMOTE_TMP_PATH
 		ssh $DEST "cd $REMOTE_TMP_PATH ; tar zxvf package.tgz ; rm package.tgz ;"
-		ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH; echo $VERSION_NAME > $REMOTE_PATH/version.txt; cd $REMOTE_PATH; bash post-deploy.sh $ENV_NAME_CONFIG";
+		ssh $DEST "rm -rf $REMOTE_PATH; mv --force $REMOTE_TMP_PATH $REMOTE_PATH; echo $VERSION_NAME > $REMOTE_PATH/version.txt; cd $REMOTE_PATH; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG";
 	else
 		echo "This version is already deployed here. Execute with overwrite option";	
 	fi
