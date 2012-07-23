@@ -99,7 +99,13 @@ if $BUILD ; then
 		cd $SOURCE_DIR;
 		eval $REMOTE_ARCHIVE_HOOK;	
 	fi	
-	cd $SOURCE_DIR;			
+
+	if [ -f $SOURCE_DIR/post-checkout.sh ]; then
+		echo "-Executing Post Checkout";
+		bash post-checkout.sh;
+		echo "-Done Executing Post Checkout";
+	fi
+				
 	tar zcvf ../package.tgz *;		
 	ssh $DESTINATION mkdir -p $DESTINATION_DIR
 	scp $WORK_DIR/package.tgz $DESTINATION:$DESTINATION_DIR
