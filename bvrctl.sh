@@ -107,6 +107,12 @@ if $BUILD ; then
 		bash post-checkout.sh;
 		echo "-Done Executing Post Checkout";
 	fi
+	
+	if [ -f CONFIG_LOCATION/$PROJECT_NAME/post-checkout.sh ]; then
+		echo "-Executing Server Side Post Checkout";
+		bash CONFIG_LOCATION/$PROJECT_NAME/post-checkout.sh;
+		echo "-Done Executing Server Side Post Checkout"
+	fi
 				
 	tar zcvf ../package.tgz *;		
 	ssh $DESTINATION mkdir -p $DESTINATION_DIR
