@@ -100,6 +100,8 @@ if $BUILD ; then
 		eval $REMOTE_ARCHIVE_HOOK;	
 	fi	
 
+	cd $SOURCE_DIR;
+
 	if [ -f $SOURCE_DIR/post-checkout.sh ]; then
 		echo "-Executing Post Checkout";
 		bash post-checkout.sh;
