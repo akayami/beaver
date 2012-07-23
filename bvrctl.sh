@@ -104,13 +104,13 @@ if $BUILD ; then
 
 	if [ -f $SOURCE_DIR/post-checkout.sh ]; then
 		echo "-Executing Post Checkout";
-		bash post-checkout.sh;
+		source post-checkout.sh;
 		echo "-Done Executing Post Checkout";
 	fi
 	
 	if [ -f CONFIG_LOCATION/$PROJECT_NAME/post-checkout.sh ]; then
 		echo "-Executing Server Side Post Checkout";
-		bash CONFIG_LOCATION/$PROJECT_NAME/post-checkout.sh;
+		source CONFIG_LOCATION/$PROJECT_NAME/post-checkout.sh;
 		echo "-Done Executing Server Side Post Checkout"
 	fi
 				
