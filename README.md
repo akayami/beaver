@@ -31,3 +31,5 @@ bvrctl.sh - This is the main control through which most commands are executed.
 
 #### Tricks:
 1. To know what projects are available: `bvrctl.sh -p`  
+2. Check archived builds: `bvrctl.sh -p project -a`
+3. Check deployed version: `bvrctl.sh -p project -e staging -s`
