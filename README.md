@@ -20,3 +20,14 @@ The process modeled consists of 3 basic steps:
 4. Allows for abstract versioning. If version is provided it will be used, otherwise, revision number is used. 
 5. The whole deployment process is pushed through ssh/scp. 
 6. The tool should be system agnostic, as long a bash is suppored (that's the general goal anyways).
+
+### Usage:
+bvrctl.sh - This is the main control through which most commands are executed. 
+
+#### Build Examples:
+`bvrctl.sh -p webcams -e stage -b trunk -v 0.0.1`
+
+`bvrctl.sh -p webcams -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1`
+
+#### Tricks:
+1. To know what projects are available: `bvrctl.sh -p`  
