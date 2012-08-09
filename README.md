@@ -8,7 +8,7 @@ Simple, easy and highly flexible deployment tool in BASH
 
 The process modeled consists of 3 basic steps:
 
-1. Build: Code retrival form a source (ex. git, svn), preparation and storage of the package.
+1. Build/Archive: Code retrival form a source (ex. git, svn), preparation and storage of the package.
 2. Deployment: Transfer of the package to a target servers
 3. Flip: Switching of version on target servers
 
@@ -24,6 +24,20 @@ The process modeled consists of 3 basic steps:
 ### Usage:
 bvrctl.sh - This is the main control through which most commands are executed. 
 
+##### Options:
+
+-p *project_name* - A project name preconfigured in the deployment tool
+
+-e *enviorment_name* - The deployment target enviroment. Ex. prod, dev, stage. You can configure any number of ENVs and there is no implied flow between them.
+
+-v *version_name* - A name by which you would like to refer to this build.
+
+-r *revision_name* - A revision form which you would like to build (default: HEAD). If revision name is set, it will also set version, unless a version is also set separetly.
+
+-b *branch_name* - Branch from which you would like to checkout. By default, it is trunk/master, but any other can be specified
+
+
+
 #### Build Examples:
 `bvrctl.sh -p project -e stage -b trunk -v 0.0.1`
 
@@ -33,3 +47,4 @@ bvrctl.sh - This is the main control through which most commands are executed.
 1. To know what projects are available: `bvrctl.sh -p`  
 2. Check archived builds: `bvrctl.sh -p project -a`
 3. Check deployed version: `bvrctl.sh -p project -e staging -s`
+
