@@ -22,6 +22,13 @@ MESSAGE=""
 STATUS=false;
 ARCHIVED=false;
 
+function shutDown() {
+	echo "End Of Program";
+	rm -rf $WORK_DIR;
+	exit 0; 		
+}
+
+
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
 then
 	echo "Usage: `basename $0` options (-pv)"
@@ -53,31 +60,40 @@ do
 	esac
 done
 
+echo "-Rev: $REVISION"
+
 EXIST=`test -d $CONFIG_LOCATION/$PROJECT_NAME || echo "false"`;
 
 if [ -z "$PROJECT_NAME" -o "$EXIST" = "false" ]; then
 	echo "Project name not provided or invalid. List of projects configured:"
 	ls  $CONFIG_LOCATION;
-	exit 0;
+	shutDown;
 fi
 
 mkdir -p $SOURCE_DIR;
 
 source $CONFIG_LOCATION/$PROJECT_NAME/source;
 
-echo "Rev: $REVISION"
+if $STATUS -a [ -z "$VERSION_NAME" ]; then
+	echo "Displaying Status:";
+	ssh $DESTINATION bvrstat.sh -p $PROJECT_NAME -e $ENV_NAME;
+fi
+
+# Checking if the project is already deployed
 
 DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -t`;
 
 DESTINATION_DIR=$DESTINATION_ARCHIVE/$PROJECT_NAME/$VERSION_NAME;
 
 if [ "$ARCHIVED" = "true" ]; then
+	echo "### Listing Archived Versions";
 	ssh $DESTINATION ls $DESTINATION_ARCHIVE/$PROJECT_NAME;
+	echo "### Done listing Archived Versions";
 fi
 
 if [ -z "$VERSION_NAME" ]; then
-	echo "Missing Version Name: You need to at least specify revision, or version";
-	exit 0;
+	echo "Will not build - Revision not specific (HEAD) and version not specified";
+	shutDown;
 fi
 
 EXIST=`ssh $DESTINATION test -d $DESTINATION_DIR || echo "0"`;
@@ -90,6 +106,7 @@ then
 		echo "Project already archived, skipping pushing...";			
 	fi	
 fi
+
 if $BUILD ; then
 	# Building off github archive, while leaving a new tag
 	echo $SOURCE;
@@ -134,5 +151,4 @@ if $STATUS ; then
 	echo "Displaying Status:";
 	ssh $DESTINATION bvrstat.sh -p $PROJECT_NAME -e $ENV_NAME;
 fi
-
-rm -rf $WORK_DIR; 
+shutDown

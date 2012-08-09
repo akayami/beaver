@@ -43,8 +43,8 @@ REMOTE_PATH=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 
 for DEST in "${SERVERS[@]}"
 do
-	echo "-Listing Deployed Versions"
+	echo "### Listing Deployed Versions"
 	STAT=`ssh $DEST "ls -l $REMOTE_PATH"`;
 	echo "$DEST => $STAT";
-	echo "-Done Listing Deployed Versions";
+	echo "### Done Listing Deployed Versions";
 done
