@@ -5,8 +5,8 @@ E_OPTERROR=85
 PROJECT_NAME=""
 VERSION_NAME=""
 ENV_NAME=""
-TARGET="/var/beaver/archive"
-CONFIG_LOCATION="/etc/beaver/servers"
+TARGET=$HOME".bvrconfig/archive"
+CONFIG_LOCATION=$HOME".bvrconfig"
 SERVER_DEPLOY_TMP_HOME="/tmp/$PID"
 
 
