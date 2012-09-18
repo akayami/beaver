@@ -6,7 +6,7 @@ PROJECT_NAME=""
 VERSION_NAME=""
 ENV_NAME=""
 TARGET=$HOME"/.bvrconfig/archive"
-CONFIG_LOCATION=$HOME"/.bvrconfig"
+CONFIG_LOCATION=$HOME"/.bvrconfig/source"
 SERVER_DEPLOY_TMP_HOME="/tmp/$PID"
 
 
