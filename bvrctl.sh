@@ -2,7 +2,7 @@
 PID=$$
 WORK_DIR="/tmp/beaver."$PID
 SOURCE_DIR=$WORK_DIR"/source"
-CONFIG_LOCATION=$HOME"./bvrconfig"
+CONFIG_LOCATION=$HOME"/.bvrconfig"
 NO_ARGS=0 
 E_OPTERROR=85
 PROJECT_NAME=""

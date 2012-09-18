@@ -5,7 +5,7 @@ E_OPTERROR=85
 PROJECT_NAME=""
 VERSION_NAME=""
 ENV_NAME=""
-CONFIG_LOCATION=$HOME"./bvrconfig"
+CONFIG_LOCATION=$HOME"/.bvrconfig"
 
 
 if [ $# -eq "$NO_ARGS" ]    # Script invoked with no command-line args?
