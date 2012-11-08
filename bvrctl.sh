@@ -1,8 +1,6 @@
 #!/bin/bash
 PID=$$
-WORK_DIR="/tmp/beaver."$PID
-SOURCE_DIR=$WORK_DIR"/source"
-CONFIG_LOCATION=$HOME"/.bvrconfig/source"
+TMP="/tmp"
 NO_ARGS=0 
 E_OPTERROR=85
 PROJECT_NAME=""
@@ -21,6 +19,19 @@ REMOTE_ARCHIVE_HOOK=""
 MESSAGE=""
 STATUS=false;
 ARCHIVED=false;
+
+if [ -e $HOME"/.bvrconfig/config" ]
+then
+	source $HOME"/.bvrconfig/config"
+fi
+
+WORK_DIR=$TMP"/beaver."$PID
+SOURCE_DIR=$WORK_DIR"/source"
+CONFIG_LOCATION=$HOME"/.bvrconfig/source"
+
+echo $WORK_DIR;
+exit 0;
+
 
 function shutDown() {
 	echo "End Of Program";
