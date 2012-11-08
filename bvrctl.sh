@@ -29,8 +29,7 @@ WORK_DIR=$TMP"/beaver."$PID
 SOURCE_DIR=$WORK_DIR"/source"
 CONFIG_LOCATION=$HOME"/.bvrconfig/source"
 
-echo $WORK_DIR;
-exit 0;
+echo "Work Dir:"$WORK_DIR;
 
 
 function shutDown() {
