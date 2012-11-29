@@ -38,10 +38,21 @@ bvrctl.sh - This is the main control through which most commands are executed.
 
 
 
-#### Build Examples:
+#### Step 1: Build Examples:
 `bvrctl.sh -p project -e stage -b trunk -v 0.0.1`
 
 `bvrctl.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1`
+
+#### Step 2: Deploy Examples:
+`bvrctl.sh -p project -e stage -v 2012-08-09-1 -d`
+
+#### Step 3: Flip Example:
+`bvrctl.sh -p project -e stage -v 2012-08-09-1 -f`
+
+#### All In One Example:
+`bvrctl.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1 -d -f`
+
+
 
 #### Tricks:
 1. To know what projects are available: `bvrctl.sh -p`  
