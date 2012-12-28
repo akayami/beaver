@@ -87,7 +87,7 @@ if $STATUS -a [ -z "$VERSION_NAME" ]; then
 	ssh $DESTINATION bvrstat.sh -p $PROJECT_NAME -e $ENV_NAME;
 fi
 
-# Checking if the project is already deployed
+# Checking if the project is already archived
 
 DESTINATION_ARCHIVE=`ssh $DESTINATION $ARCHIVE_COMMAND -t`;
 
@@ -100,7 +100,7 @@ if [ "$ARCHIVED" = "true" ]; then
 fi
 
 if [ -z "$VERSION_NAME" ]; then
-	echo "Will not build - Revision not specific (HEAD) and version not specified";
+	echo "Will not build - Revision not specific (HEAD assumed) and version not specified";
 	shutDown;
 fi
 
@@ -116,7 +116,7 @@ then
 fi
 
 if $BUILD ; then
-	# Building off github archive, while leaving a new tag
+	# Building off source control system, while leaving a new tag
 	echo $SOURCE;
 	eval $SOURCE;
 	if [ ! -z "$REMOTE_ARCHIVE_HOOK" ]; then
