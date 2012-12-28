@@ -29,8 +29,6 @@ WORK_DIR=$TMP"/beaver."$PID
 SOURCE_DIR=$WORK_DIR"/source"
 CONFIG_LOCATION=$HOME"/.bvrconfig/source"
 
-echo "Work Dir:"$WORK_DIR;
-
 
 function shutDown() {
 	echo "End Of Program";
