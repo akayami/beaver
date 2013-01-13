@@ -1,3 +1,0 @@
-# Sample git hub command
-SOURCE="git clone https://github.com/akayami/yami.git $SOURCE_DIR; cd $SOURCE_DIR; git checkout -b $BRANCH $REVISION; rm -rf .git;"
-DESTINATION="tomasz@localhost"

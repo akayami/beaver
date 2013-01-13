@@ -1,4 +1,4 @@
-Beaver - The Eager
+Beaver 0.1 - The Eager 
 ======
 
 Simple, easy and highly flexible deployment tool in BASH
@@ -16,13 +16,14 @@ The process modeled consists of 3 basic steps:
 
 1. All steps may be executed using single command, or can be executed one by one.
 2. The tool can deploy using branch/tag and/or revisions.
-3. Previous versions are left on the server, and a Flip can be executed in case of faulty deployment
+3. Previous versions are left on the server, and a flip can be executed if deployment revert is needed
 4. Allows for abstract versioning. If version is provided it will be used, otherwise, revision number is used. 
-5. The whole deployment process is pushed through ssh/scp. 
+5. Deployment process uses rsync. Server side, a copy of previous version in made and it is upgraded using rsync.
 6. The tool should be system agnostic, as long a bash is suppored (that's the general goal anyways).
 
 ### Usage:
-bvrctl.sh - This is the main control through which most commands are executed. 
+
+beaver.sh - This is the main control through which most commands are executed. 
 
 ##### Options:
 
@@ -36,26 +37,32 @@ bvrctl.sh - This is the main control through which most commands are executed.
 
 -b *branch_name* - Branch from which you would like to checkout. By default, it is trunk/master, but any other can be specified
 
+-B - Build a new package
+
+-d - Deploy a specific version of a package on a specific enviroment
+
+-f - Flip a specific version of a package on a specific enviroment
 
 
 #### Step 1: Build Examples:
-`bvrctl.sh -p project -e stage -b trunk -v 0.0.1`
+`beaver.sh -p project -e stage -b trunk -v 0.0.1 -B`
 
-`bvrctl.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1`
+`beaver.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1 -B`
 
 #### Step 2: Deploy Examples:
-`bvrctl.sh -p project -e stage -v 2012-08-09-1 -d`
+`beaver.sh -p project -e stage -v 2012-08-09-1 -d`
 
 #### Step 3: Flip Example:
-`bvrctl.sh -p project -e stage -v 2012-08-09-1 -f`
+`beaver.sh -p project -e stage -v 2012-08-09-1 -f`
 
 #### All In One Example:
-`bvrctl.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1 -d -f`
+`beaver.sh -p project -e stage -b branches/someBranch -r 3235 -v 2012-08-09-1 -d -f`
 
 
 
 #### Tricks:
-1. To know what projects are available: `bvrctl.sh -p`  
-2. Check archived builds: `bvrctl.sh -p project -a`
-3. Check deployed version: `bvrctl.sh -p project -e staging -s`
+1. To know what projects are available: `beaver.sh -p`  
+2. Check archived builds: `beaver.sh -p project -a`
+3. Check deployed version: `beaver.sh -p project -e staging -s`
+4. Display info about a version: `beaver.sh -p project -v version -i`
 

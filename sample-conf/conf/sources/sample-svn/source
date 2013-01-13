@@ -1,0 +1,4 @@
+REPO_TYPE="svn"
+# svn path excluding "trunk"
+REPO_URL="https://svnrepo.somewhere.ext/path/to/repo" 
+DEFAULT_BRANCH="trunk"

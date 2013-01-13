@@ -1,0 +1,2 @@
+SERVERS=( deploy@akayami.com  )
+SERVERS_DEPLOY_HOME=/my/apps/home/path

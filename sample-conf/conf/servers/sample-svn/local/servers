@@ -1,0 +1,2 @@
+SERVERS=( tomasz@localhost )
+SERVERS_DEPLOY_HOME=/my/apps/home/path
