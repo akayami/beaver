@@ -29,7 +29,10 @@ source $SELF_DIR/lib/validation.sh;
 
 source $BVR_HOME/sources/$PROJECT_NAME/source;
 
-[ -z $BRANCH ] && BRANCH="$DEFAULT_BRANCH";
+if [ -z $BRANCH ]; then
+	BRANCH="$DEFAULT_BRANCH";
+	source $BVR_HOME/sources/$PROJECT_NAME/source;
+fi
 if [ -z $BRANCH ]; then 
 	echo "Branch not provided, and no default set in $BVR_HOME/sources/$PROJECT_NAME/source"; exit;
 fi 

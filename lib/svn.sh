@@ -4,10 +4,6 @@ function reset_source() {
 	url=$2
 	branch=$3
 	rev=$4
-	echo $dir;
-	echo $url;
-	echo $branch;
-	echo $rev;
 	if [ ! -d $dir ]; then
 		mkdir -p $dir;
 		svn checkout $url/$branch $dir;
@@ -24,8 +20,7 @@ function reset_source() {
 function get_last_commit_id() {
 	local old=`pwd`;
 	cd $1;
-	svn info | sed -rn 's/.*Revision:\s+([0-9]+).*/\1/p'
-	#git log --max-count=1 | sed -rn '/commit/ s/commit (.+)/\1/p'
+	svn info | sed -rn 's/.*Revision:\s+([0-9]+).*/\1/p'	
 	cd $old;
 }
 
