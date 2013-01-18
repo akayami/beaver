@@ -26,7 +26,7 @@ cp -r $HOME/.bvrconfig $HOME/.bvrconfig-$PID;
 #echo "## Archives done";
 
 echo "## Migrating configs";
-mkdir -p $APP_HOME/conf
+mkdir -p $APP_HOME/conf/sources
 for dir in `ls "$APP_HOME/source/"`
 do
 	if [ -d "$APP_HOME/source/$dir" ]; then
