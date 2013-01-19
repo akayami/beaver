@@ -63,6 +63,13 @@ function copy_source_to_archive() {
 	rev=$4
 	mkdir -p $archive/payload/
 	cp -r $source/* $archive/payload
+	if [ -f $archive/payload/post-checkout.sh ]; then
+		echo "# Executing post checkout";
+		local old=`pwd`;
+		cd $archive/payload/;
+		bash post-checkout.sh $source $archive $branch $rev;
+		cd $old;
+	fi
 	get_last_commit_id $source > $archive/commit_id
 	echo -e "BRANCH=$branch\nREVISION=$REVISION\nSTAMP=$STAMP" > $archive/release_info 
 }

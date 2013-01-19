@@ -29,7 +29,10 @@ source $SELF_DIR/lib/validation.sh;
 
 source $BVR_HOME/sources/$PROJECT_NAME/source;
 
-[ -z $BRANCH ] && BRANCH="$DEFAULT_BRANCH";
+if [ -z $BRANCH ]; then
+	BRANCH="$DEFAULT_BRANCH";
+	source $BVR_HOME/sources/$PROJECT_NAME/source;
+fi
 if [ -z $BRANCH ]; then 
 	echo "Branch not provided, and no default set in $BVR_HOME/sources/$PROJECT_NAME/source"; exit;
 fi 
@@ -85,8 +88,8 @@ if create_lock $LOCK; then
 	if $DEPLOY ; then
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		archive_code=$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload
-		remote_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
-		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
+		remote_path=$SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
+		current_path=$SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 				
 		for DEST in "${SERVERS[@]}"
 		do			
@@ -97,18 +100,19 @@ if create_lock $LOCK; then
 					echo "Copying ...";
 					ssh $DEST mkdir -p $remote_path; cp -r $current_path/* $remote_path;
 				else
-					mkdir -p $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME;
+					mkdir -p $SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME;
 				fi
 				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
 				rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/
+				ssh $dest cd $remote_path; bash post-deploy.sh $ENV_NAME
 			fi
 		done
 	fi
 	
 	if $FLIP ; then
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
-		remote_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
-		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
+		remote_path=$SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
+		current_path=$SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 		is_present_on_all_servers=true;
 		for DEST in "${SERVERS[@]}"
 		do
@@ -118,27 +122,26 @@ if create_lock $LOCK; then
 			fi
 		done
 		if ! $is_present_on_all_servers ; then
-			echo "# Version '$VERSION_NAME' is not present on all server. Aborting flip...";
+			echo "# Version '$VERSION_NAME' is not present on all servers. Aborting flip...";
 			exit 1;
 		fi
 		for DEST in "${SERVERS[@]}"
 		do
 			echo "# Flipping '$DEST' to '$VERSION_NAME'";
-			echo $remote_path;
-			echo $current_path;			
 			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
 				ssh $DEST rm $current_path; ln -s $remote_path $current_path;
 			else
 				ssh $DEST ln -s $remote_path $current_path;
-			fi 
+			fi
+			ssh $dest cd $current_path; bash post-deploy.sh; 
 		done
 	fi
 	if $STATUS ; then 
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		for DEST in "${SERVERS[@]}"
 		do
-			#echo `ssh $DEST "ls -al $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current | sed -nr 's|.*/(.*)|\1|p'"`;
-			remote_ver=`ssh $DEST "ls -al $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current | sed -nr 's|.*/(.*)|\1|p'"`;
+			#echo `ssh $DEST "ls -al $SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current | sed -nr 's|.*/(.*)|\1|p'"`;
+			remote_ver=`ssh $DEST "ls -al $SERVERS_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current | sed -nr 's|.*/(.*)|\1|p'"`;
 			echo "$DEST => $remote_ver";
 		done
 	fi
