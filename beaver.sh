@@ -105,7 +105,7 @@ if create_lock $LOCK; then
 				fi
 				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
 				rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/
-				ssh $DEST cd $remote_path; bash post-deploy.sh $ENV_NAME
+				ssh $DEST cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG
 			fi
 		done
 	fi
