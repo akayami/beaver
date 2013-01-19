@@ -134,7 +134,7 @@ if create_lock $LOCK; then
 			else
 				ssh $DEST ln -s $remote_path $current_path;
 			fi
-			ssh $dest cd $current_path; bash post-deploy.sh; 
+			ssh $DEST cd $current_path; bash post-flip.sh; 
 		done
 	fi
 	if $STATUS ; then 
