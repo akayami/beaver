@@ -98,14 +98,14 @@ if create_lock $LOCK; then
 			else
 				if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
 					echo "Copying ...";
-					ssh $DEST mkdir -p $remote_path; cp -r $current_path/* $remote_path;
+					ssh $DEST "mkdir -p $remote_path; cp -r $current_path/* $remote_path";
 				else
 					echo $remote_path;
-					ssh $DEST mkdir -p $remote_path;
+					ssh $DEST "mkdir -p $remote_path";
 				fi
 				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
 				rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/
-				ssh $DEST cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG
+				ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG"
 			fi
 		done
 	fi
@@ -130,11 +130,11 @@ if create_lock $LOCK; then
 		do
 			echo "# Flipping '$DEST' to '$VERSION_NAME'";
 			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
-				ssh $DEST rm $current_path; ln -s $remote_path $current_path;
+				ssh $DEST "rm $current_path; ln -s $remote_path $current_path";
 			else
-				ssh $DEST ln -s $remote_path $current_path;
+				ssh $DEST "ln -s $remote_path $current_path";
 			fi
-			ssh $DEST cd $current_path; bash post-flip.sh; 
+			ssh $DEST "cd $current_path; bash post-flip.sh"; 
 		done
 	fi
 	if $STATUS ; then 
