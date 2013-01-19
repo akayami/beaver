@@ -34,7 +34,6 @@ function copy_source_to_archive() {
 	local rev=$4;
 	mkdir -p $archive/payload/;
 	cp -r $source/* $archive/payload;
-	find $archive/payload/ -name ".svn" -type d -exec rm -rf {} \; > /dev/null 2>&1;
 	if [ -f $archive/payload/post-checkout.sh ]; then
 		echo "# Executing post checkout";
 		local old=`pwd`;

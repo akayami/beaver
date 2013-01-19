@@ -70,16 +70,21 @@ if create_lock $LOCK; then
 		printe_archive_info $BVR_ARCHIVE_HOME/$PROJECT_NAME $VERSION_NAME
 	fi
 	
-	if $BUILD ; then
-		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;		
-		if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
-			echo "# Building new package..."
-			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
-			copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
-			echo "# Done building and archiving new version: $VERSION_NAME";
-		else
-			echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
-		fi
+	if [ $BUILD ] ; then
+		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;
+		if [ $USE_ARCHIVE ] ; then
+			echo "# Using no archive method";			
+			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;			
+		else 
+			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
+				echo "# Building new package..."
+				reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
+				copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
+				echo "# Done building and archiving new version: $VERSION_NAME";
+			else
+				echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
+			fi
+		fi		
 	fi
 	
 	#source $BVR_HOME/$PROJECT_NAME/env/$ENV_NAME/servers;
@@ -87,7 +92,11 @@ if create_lock $LOCK; then
 	
 	if $DEPLOY ; then
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
-		archive_code=$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload
+		if [ $USE_ARCHIVE ]; then
+			archive_code=$REPO_SOURCE
+		else 
+			archive_code=$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload
+		fi
 		remote_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
 		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 				
@@ -104,8 +113,19 @@ if create_lock $LOCK; then
 					ssh $DEST "mkdir -p $remote_path";
 				fi
 				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
-				rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/
-				ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG"
+				#rsync -avz --exclude-from=$BVR_HOME/rsync-exclude-list --delete -e ssh $archive_code/ $DEST:$remote_path/
+				if [ -f $BVR_HOME/sources/$PROJECT_NAME/rsync-exclude ]; then
+					echo "Using exclude-from:";
+					#exit;
+					rsync -avz --exclude='.svn' --exclude='.git' --exclude-from=$BVR_HOME/sources/$PROJECT_NAME/rsync-exclude --delete -e ssh $archive_code/ $DEST:$remote_path/
+				else
+					echo "Stadard exclude:";
+					#exit;
+					rsync -avz --exclude='.svn' --exclude='.git' --delete -e ssh $archive_code/ $DEST:$remote_path/
+				fi
+				echo "Executing remote postdeploy";
+				ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG;"
+				echo "Done";
 			fi
 		done
 	fi
