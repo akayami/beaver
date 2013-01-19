@@ -6,6 +6,8 @@ function reset_source() {
 	rev=$4
 	if [ ! -d $dir ]; then
 		mkdir -p $dir;
+	fi
+	if [ ! -d dir/.git ]; then
 		git clone $url $dir;
 	fi
 	cd $dir;

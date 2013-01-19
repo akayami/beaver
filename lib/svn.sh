@@ -4,10 +4,13 @@ function reset_source() {
 	url=$2
 	branch=$3
 	rev=$4
-	if [ ! -d $dir ]; then
-		mkdir -p $dir;
+    if [ ! -d $dir ]; then
+    	mkdir -p $dir;
+    fi
+    if [ ! -d $dir/.svn ]; then
 		svn checkout $url $dir;
-	fi
+    fi
+
 	cd $dir;
 	if [ ! -z $rev ]; then 
 		echo "Revision provided";
