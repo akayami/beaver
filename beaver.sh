@@ -100,11 +100,12 @@ if create_lock $LOCK; then
 					echo "Copying ...";
 					ssh $DEST mkdir -p $remote_path; cp -r $current_path/* $remote_path;
 				else
-					ssh $DEST mkdir -p $SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME;
+					echo $remote_path;
+					ssh $DEST mkdir -p $remote_path;
 				fi
 				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
 				rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/
-				ssh $dest cd $remote_path; bash post-deploy.sh $ENV_NAME
+				ssh $DEST cd $remote_path; bash post-deploy.sh $ENV_NAME
 			fi
 		done
 	fi
