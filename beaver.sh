@@ -72,7 +72,7 @@ if create_lock $LOCK; then
 	
 	if $BUILD ; then
 		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;		
-		if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME ]; then
+		if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
 			echo "# Building new package..."
 			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
 			copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
