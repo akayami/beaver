@@ -101,32 +101,37 @@ if create_lock $LOCK; then
 		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 				
 		for DEST in "${SERVERS[@]}"
-		do			
-			if [ ! `ssh $DEST test -d $remote_path || echo 0`  -a ! $OVERWRITE ]; then
-				echo "# Version '$VERSION_NAME' of package '$PROJECT_NAME' already deployed on $DEST";
-			else
-				if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
-					echo "Copying ...";
-					ssh $DEST "mkdir -p $remote_path; cp -r $current_path/* $remote_path";
-				else
-					echo $remote_path;
-					ssh $DEST "mkdir -p $remote_path";
+		do	
+			if ! $OVERWRITE ; then
+				if [ ! `ssh $DEST test -d $remote_path || echo 0` ]; then
+					# echo $OVERWRITE;
+					echo "# Version '$VERSION_NAME' of package '$PROJECT_NAME' already deployed on $DEST";
+					continue;
 				fi
-				#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
-				#rsync -avz --exclude-from=$BVR_HOME/rsync-exclude-list --delete -e ssh $archive_code/ $DEST:$remote_path/
-				if [ -f $BVR_HOME/sources/$PROJECT_NAME/rsync-exclude ]; then
-					echo "Using exclude-from:";
-					#exit;
-					rsync -avz --exclude='.svn' --exclude='.git' --exclude-from=$BVR_HOME/sources/$PROJECT_NAME/rsync-exclude --delete -e ssh $archive_code/ $DEST:$remote_path/
-				else
-					echo "Stadard exclude:";
-					#exit;
-					rsync -avz --exclude='.svn' --exclude='.git' --delete -e ssh $archive_code/ $DEST:$remote_path/
-				fi
-				echo "Executing remote postdeploy";
-				ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG;"
-				echo "Done";
 			fi
+			
+			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
+				echo "Copying ...";
+				ssh $DEST "mkdir -p $remote_path; cp -r $current_path/* $remote_path";
+			else
+				echo $remote_path;
+				ssh $DEST "mkdir -p $remote_path";
+			fi
+			#echo "rsync -avz --delete -e ssh $archive_code/ $DEST:$remote_path/";
+			#rsync -avz --exclude-from=$BVR_HOME/rsync-exclude-list --delete -e ssh $archive_code/ $DEST:$remote_path/
+			if [ -f $BVR_HOME/sources/$PROJECT_NAME/rsync-exclude ]; then
+				echo "Using exclude-from:";
+				#exit;
+				rsync -avz --exclude='.svn' --exclude='.git' --exclude-from=$BVR_HOME/sources/$PROJECT_NAME/rsync-exclude --delete -e ssh $archive_code/ $DEST:$remote_path/
+			else
+				echo "Stadard exclude:";
+				#exit;
+				rsync -avz --exclude='.svn' --exclude='.git' --delete -e ssh $archive_code/ $DEST:$remote_path/
+			fi
+			echo "Executing remote postdeploy";
+			ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG;"
+			echo "Done";
+			
 		done
 	fi
 	
