@@ -105,7 +105,7 @@ if create_lock $LOCK; then
 			if [ ! `ssh $DEST test -d $remote_path || echo 0` ]; then
 				echo "# Version '$VERSION_NAME' of package '$PROJECT_NAME' already deployed on $DEST";
 			else
-				if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
+				if [ ! `ssh $DEST test -d $current_path || echo 0` -a ! $OVERWRITE ]; then
 					echo "Copying ...";
 					ssh $DEST "mkdir -p $remote_path; cp -r $current_path/* $remote_path";
 				else
