@@ -70,7 +70,7 @@ if create_lock $LOCK; then
 		printe_archive_info $BVR_ARCHIVE_HOME/$PROJECT_NAME $VERSION_NAME
 	fi
 	
-	if [ $BUILD ] ; then
+	if $BUILD ; then
 		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;
 		if [ ! $USE_ARCHIVE ] ; then
 			echo "# Using no-archive method";			
