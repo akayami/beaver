@@ -185,7 +185,7 @@ if create_lock $LOCK; then
 			fi
 			echo "Email: $EMAIL_LIST - FROM: $EMAIL_FROM";
 			EMAIL_MESSAGE="$EMAIL_MESSAGE Completed For: $PROJECT_NAME - $ENV_NAME - $VERSION_NAME\n\n\n----";
-			echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" -a=FROM:$EMAIL_FROM "$EMAIL_LIST"
+			echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" -r $EMAIL_FROM "$EMAIL_LIST"
 		fi	
 	fi
 else
