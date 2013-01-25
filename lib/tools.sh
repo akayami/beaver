@@ -5,7 +5,7 @@
 function create_lock() {
 	LOCK_PATH="$1"
 	LOCK_FILE=${LOCK_PATH}.lock.d;
-	if mkdir "${LOCK_FILE}"; then
+	if mkdir -p "${LOCK_FILE}"; then
 		#echo "Created lock file for pid $$";
 		echo "$$" > $LOCK_FILE/pid
 		return 0;
