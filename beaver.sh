@@ -42,7 +42,7 @@ fi
 #echo $VERSION_NAME;
 #echo $BRANCH;
 
-LOCK="/tmp/lockfile."$PROJECT_NAME";
+LOCK="/tmp/lockfile."$PROJECT_NAME;
 REPO_SOURCE=$BVR_REPO_HOME/$PROJECT_NAME;
 
 if create_lock $LOCK; then 
