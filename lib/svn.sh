@@ -1,5 +1,5 @@
 function reset_source() {
-	echo "Checking out from svn"
+	echo "## Checking out from svn"
 	dir=$1;
 	url=$2
 	branch=$3
@@ -10,7 +10,7 @@ function reset_source() {
     if [ ! -d $dir/.svn ]; then
 		svn checkout $url $dir;
     fi
-
+	echo "## SVN Update"
 	cd $dir;
 	if [ ! -z $rev ]; then 
 		echo "Revision provided";
