@@ -11,7 +11,7 @@ function reset_source() {
 		svn checkout $url $dir;
     fi
     echo "## SVN Switch"
-    svn switch $url
+    svn switch $url $dir
 	echo "## SVN Update"
 	cd $dir;
 	if [ ! -z $rev ]; then 
