@@ -10,6 +10,8 @@ function reset_source() {
     if [ ! -d $dir/.svn ]; then
 		svn checkout $url $dir;
     fi
+    echo "## SVN Switch"
+    svn switch $url
 	echo "## SVN Update"
 	cd $dir;
 	if [ ! -z $rev ]; then 
