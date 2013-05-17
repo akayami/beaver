@@ -74,7 +74,7 @@ if create_lock $LOCK; then
 		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;
 		if ! $USE_ARCHIVE ; then
 			echo "# Using no-archive method";
-			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;			
+			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
 		else 
 			echo "# Using archive method";
 			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
@@ -86,7 +86,11 @@ if create_lock $LOCK; then
 			else
 				echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
 			fi
-		fi		
+		fi
+		if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
+			$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE
+		fi
+				
 	fi
 	
 	#source $BVR_HOME/$PROJECT_NAME/env/$ENV_NAME/servers;
@@ -98,7 +102,8 @@ if create_lock $LOCK; then
 			archive_code=$REPO_SOURCE
 		else 
 			archive_code=$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload
-		fi
+		fi		
+		
 		remote_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
 		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
 				
@@ -156,6 +161,7 @@ if create_lock $LOCK; then
 		for DEST in "${SERVERS[@]}"
 		do
 			echo "# Flipping '$DEST' to '$VERSION_NAME'";
+			ssh $DEST "cd $current_path; bash pre-flip.sh";
 			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
 				ssh $DEST "rm $current_path; ln -s $remote_path $current_path";
 			else
