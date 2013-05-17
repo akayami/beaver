@@ -173,27 +173,34 @@ if create_lock $LOCK; then
 			echo "$DEST => $remote_ver";
 		done
 	fi
-	if [ ! -z "$EMAIL_LIST" ]
-	then
-		if $BUILD -o $DEPLOY -o $FLIP ; then 
-			if $BUILD ; then
-				EMAIL_MESSAGE=" $EMAIL_MESSAGE Build ";
-			fi
-			if $DEPLOY ; then
-				EMAIL_MESSAGE=" $EMAIL_MESSAGE Deployment "; 
-			fi
-			if $FLIP ; then
-				EMAIL_MESSAGE=" $EMAIL_MESSAGE Flip ";
-			fi
-			echo "Email: $EMAIL_LIST - FROM: $EMAIL_FROM";
-			EMAIL_MESSAGE="$EMAIL_MESSAGE Completed For: $PROJECT_NAME - $ENV_NAME - $VERSION_NAME\n\n\n----";
+	if $BUILD -o $DEPLOY -o $FLIP ; then 
+		if $BUILD ; then
+			FINAL_MSG="$FINAL_MSG [Build]";
+		fi
+		if $DEPLOY ; then
+			FINAL_MSG="$FINAL_MSG [Deployment]"; 
+		fi
+		if $FLIP ; then
+			FINAL_MSG="$FINAL_MSG [Flip]";
+		fi
+		echo "Email: $EMAIL_LIST - FROM: $EMAIL_FROM";
+		FINAL_MSG="$FINAL_MSG Completed For: $PROJECT_NAME/$ENV_NAME/$VERSION_NAME";
+		
+		if [ ! -z "$EMAIL_LIST" ]
+		then
+					
 			if [ ! -z "$EMAIL_FROM" ]; then
-				echo -e $EMAIL_MESSAGE | mail -r $EMAIL_FROM -s "Deployment Completed - Beaver Deployment Tool" $EMAIL_LIST
+				echo -e "$FINAL_MSG\n\n\n----" | mail -r $EMAIL_FROM -s "Deployment Completed - Beaver Deployment Tool" $EMAIL_LIST
 			else
-				echo -e $EMAIL_MESSAGE | mail -s "Deployment Completed - Beaver Deployment Tool" $EMAIL_LIST
+				echo -e "$FINAL_MSG\n\n\n----" | mail -s "Deployment Completed - Beaver Deployment Tool" $EMAIL_LIST
 			fi
-		fi	
-	fi
+		fi
+	
+		mkdir -p $APP_HOME/logs/;
+		DATE=`date`;
+		echo -e "$DATE: $FINAL_MSG" >> $APP_HOME/logs/actions.log
+		
+	fi	
 else
 	echo "Lock Aquisition Failed - Quitting";
 fi
