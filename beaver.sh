@@ -25,7 +25,19 @@ BVR_HOME=$APP_HOME/conf;
 BVR_REPO_HOME=$APP_HOME/repos;
 BVR_ARCHIVE_HOME=$APP_HOME/archives;
 
-source $SELF_DIR/lib/validation.sh;
+
+if [ -z "$PROJECT_NAME" -o ! -d $BVR_HOME/sources/$PROJECT_NAME ]; then
+	echo "Error: Project does not exist. Available projects:";
+	ls $BVR_HOME/sources;
+	exit;
+fi
+
+if [ ! -f $BVR_HOME/sources/$PROJECT_NAME/source ]; then 
+	echo "Project source config missing in: $BVR_HOME/sources/$PROJECT_NAME/source !";
+	exit;
+fi
+
+#source $SELF_DIR/lib/validation.sh;
 
 source $BVR_HOME/sources/$PROJECT_NAME/source;
 
@@ -161,13 +173,13 @@ if create_lock $LOCK; then
 		for DEST in "${SERVERS[@]}"
 		do
 			echo "# Flipping '$DEST' to '$VERSION_NAME'";
-			ssh $DEST "cd $current_path; bash pre-flip.sh";
+			ssh $DEST "cd $remote_path; bash pre-flip.sh $ENV_NAME";
 			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
 				ssh $DEST "rm $current_path; ln -s $remote_path $current_path";
 			else
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
-			ssh $DEST "cd $current_path; bash post-flip.sh"; 
+			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME"; 
 		done
 	fi
 	if $STATUS ; then 
@@ -204,8 +216,7 @@ if create_lock $LOCK; then
 	
 		mkdir -p $APP_HOME/logs/;
 		DATE=`date`;
-		echo -e "$DATE: $FINAL_MSG" >> $APP_HOME/logs/actions.log
-		
+		echo -e "$DATE: $FINAL_MSG" >> $APP_HOME/logs/actions.log		
 	fi	
 else
 	echo "Lock Aquisition Failed - Quitting";
