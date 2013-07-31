@@ -11,6 +11,7 @@ function reset_source() {
 		git clone $url $dir;
 	fi
 	cd $dir;
+	git pull
 	git checkout $branch
 	git fetch $url $branch
 	git pull
