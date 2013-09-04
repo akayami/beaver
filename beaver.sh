@@ -83,15 +83,17 @@ if create_lock $LOCK; then
 	fi
 	
 	if $BUILD ; then
-		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;
+		#		[ -z $VERSION_NAME ] && VERSION_NAME=$STAMP;
 		if ! $USE_ARCHIVE ; then
 			echo "# Using no-archive method";
 			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
+			[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 		else 
 			echo "# Using archive method";
 			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
 				echo "# Building new package..."
 				reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
+				[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 				echo "# Creating Remote Copy..."
 				copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
 				echo "# Done building and archiving new version: $VERSION_NAME";

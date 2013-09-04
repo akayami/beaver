@@ -8,13 +8,13 @@ function check_enviorment() {
 	fi
 }
 
-if $DEPLOY ; then
+#if $DEPLOY ; then
 	#echo "Deploying...";
-	if [ -z $VERSION_NAME ] ; then 
-		id=$(get_last_commit_id $REPO_SOURCE);
-		VERSION_NAME=$id;
-	fi
-fi
+	#	if [ -z $VERSION_NAME ] ; then 
+		#	id=$(get_last_commit_id $REPO_SOURCE);
+		#VERSION_NAME=$id;
+	#fi
+#fi
 
 if $ENV_PROVIDED ; then	
 	while check_enviorment $ENV_NAME "$BVR_HOME/servers/$PROJECT_NAME" ; do
