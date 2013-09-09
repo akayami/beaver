@@ -181,8 +181,10 @@ if create_lock $LOCK; then
 			else
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
-			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME"; 
+			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME";			 
 		done
+		echo "# Executing deploy server post flip";
+		$BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh $VERSION_NAME;
 	fi
 	if $STATUS ; then 
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
