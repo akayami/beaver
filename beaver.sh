@@ -94,7 +94,7 @@ if create_lock $LOCK; then
 				echo "# Building new package..."
 				reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
 				[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
-				echo "# Creating Remote Copy..."
+				echo "# Creating Build/Archive Copy..."
 				copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
 				echo "# Done building and archiving new version: $VERSION_NAME";
 			else
@@ -105,7 +105,7 @@ if create_lock $LOCK; then
 			echo "# Running post-build hook"
 			$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE
 		else
-			echo "# No post-build hoook found"
+			echo "# No post-build hoook found\t '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
 		fi
 
 	fi
