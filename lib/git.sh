@@ -15,7 +15,7 @@ function reset_source() {
 	git checkout $branch
 	git fetch $url $branch
 	git pull
-	if [ ! -z $rev ]; then 
+	if [ ! -z $rev ]; then
 		echo "Revision provided";
 		git reset --hard $rev
 	fi
@@ -24,38 +24,38 @@ function reset_source() {
 function get_last_commit_id() {
 	local old=`pwd`;
 	cd $1;
-	git log --max-count=1 | sed -rn '/commit/ s/commit (.+)/\1/p'
+	git rev-parse HEAD
 	cd $old;
 }
 
 function show_full_info() {
 	pushd . >/dev/null
-	
+
 	# Find base of git directory
 	while [ ! -d .git ] && [ ! `pwd` = "/" ]; do cd ..; done
-	
+
 	# Show various information about this git directory
 	if [ -d .git ]; then
 	  echo "== Remote URL: `git remote -v`"
-	
+
 	  echo "== Remote Branches: "
 	  git branch -r
 	  echo
-	
+
 	  echo "== Local Branches:"
 	  git branch
 	  echo
-	
+
 	  echo "== Configuration (.git/config)"
 	  cat .git/config
 	  echo
-	
+
 	  echo "== Most Recent Commit"
 	  git log --max-count=1
 	else
 	  echo "Not a git repository."
 	fi
-	
+
 	popd >/dev/null
 }
 
@@ -74,5 +74,5 @@ function copy_source_to_archive() {
 		cd $old;
 	fi
 	get_last_commit_id $source > $archive/commit_id
-	echo -e "BRANCH=$branch\nREVISION=$REVISION\nSTAMP=$STAMP" > $archive/release_info 
+	echo -e "BRANCH=$branch\nREVISION=$REVISION\nSTAMP=$STAMP" > $archive/release_info
 }

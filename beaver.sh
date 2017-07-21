@@ -101,6 +101,7 @@ if create_lock $LOCK; then
 				echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
 			fi
 		fi
+		echo "$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh"
 		if [ -f $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh ]; then
 			echo "# Running post-build hook (project)"
 			$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh
@@ -118,6 +119,11 @@ if create_lock $LOCK; then
 
 	#source $BVR_HOME/$PROJECT_NAME/env/$ENV_NAME/servers;
 	#source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
+
+	if ! $ENV_PROVIDED ; then
+		echo "# Missing enviroment paramter. Use -e to specify enviroment"
+		exit 1
+	fi
 
 	if $DEPLOY ; then
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
