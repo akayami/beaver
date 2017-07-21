@@ -101,11 +101,17 @@ if create_lock $LOCK; then
 				echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
 			fi
 		fi
-		if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
-			echo "# Running post-build hook"
-			$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE
+		if [ -f $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh ]; then
+			echo "# Running post-build hook (project)"
+			$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh
 		else
-			echo "# No post-build hoook found\t '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
+			echo "# No post-build hoook found '$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/post-build.sh'"
+		fi
+		if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
+			echo "# Running post-build hook (global)"
+			$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME
+		else
+			echo "# No post-build hoook found '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
 		fi
 
 	fi

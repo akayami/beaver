@@ -1,6 +1,6 @@
 PID=$$
 TMP="/tmp"
-NO_ARGS=0 
+NO_ARGS=0
 E_OPTERROR=85
 PROJECT_NAME=""
 VERSION_NAME=""
@@ -15,7 +15,7 @@ REVISION=""
 DEPLOY=false
 FLIP=false
 OVERWRITE=false
-BUILD=true
+BUILD=false
 REMOTE_ARCHIVE_HOOK=""
 MESSAGE=""
 STATUS=false;
@@ -39,7 +39,7 @@ do
 		p	) PROJECT_NAME=${OPTARG};;
 		v	) VERSION_NAME=${OPTARG};;
 		c   ) CONFIG_LOCATION=${OPTARG};;
-		r	) REVISION=${OPTARG};; 
+		r	) REVISION=${OPTARG};;
 		b	) BRANCH=${OPTARG};;
 		e	) ENV_PROVIDED=true;ENV_NAME=${OPTARG};;
 		d	) DEPLOY=true;;
@@ -51,15 +51,15 @@ do
 		i	) INFO=true;;
 		B	) BUILD=true;;
 		l	) LENGTH=${OPTARG};;
-		\?	) echo "Unrecognized option -$OPTARG"; exit 1;;	
-		:	) 
+		\?	) echo "Unrecognized option -$OPTARG"; exit 1;;
+		:	)
 				case $OPTARG in
 					e	) ENV_PROVIDED=true;;
 					*	) echo "Option -$OPTARG requires an argument"; exit 1;;
 				esac
 			;;
-		
-		
+
+
 	esac
 done
 <<COMMENT1
@@ -69,11 +69,11 @@ do
 		p	) echo "-Project: ${OPTARG}"; PROJECT_NAME=${OPTARG};;
 		v	) echo "-Version: ${OPTARG}"; VERSION_NAME=${OPTARG};;
 		c   ) echo "-Config Dir:${OPTARG}"; CONFIG_LOCATION=${OPTARG};;
-		r	) echo "-Revision: ${OPTARG}"; REVISION=${OPTARG}; 
-				if [ -z $VERSION_NAME ] 
-				then 
+		r	) echo "-Revision: ${OPTARG}"; REVISION=${OPTARG};
+				if [ -z $VERSION_NAME ]
+				then
 					echo "-Version Auto Set:${OPTARG}";VERSION_NAME=${OPTARG};
-				fi 
+				fi
 				;;
 		b	) echo "-Branch: ${OPTARG}"; BRANCH=${OPTARG};;
 		e	) echo "-Enviorment ${OPTARG}"; ENV_NAME=${OPTARG};;
