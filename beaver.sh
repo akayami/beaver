@@ -120,6 +120,8 @@ if create_lock $LOCK; then
 		fi
 	fi
 
+	source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
+
 	if $DEPLOY ; then
 
 		[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
@@ -128,7 +130,6 @@ if create_lock $LOCK; then
 			echo "# Missing enviroment paramter. Use -e to specify enviroment"
 			exit 1
 		fi
-		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		if  ! $USE_ARCHIVE ; then
 			archive_code=$REPO_SOURCE
 		else
