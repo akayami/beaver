@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -o errexit
+#set -o nounset
+
 # Determines the script location
 pushd . > /dev/null
 SELF_DIR="${BASH_SOURCE[0]}";
@@ -90,42 +93,41 @@ if create_lock $LOCK; then
 			[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 		else
 			echo "# Using archive method";
-			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME -o $OVERWRITE ]; then
-				echo "# Building new package..."
+			[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
+			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME ] || $OVERWRITE ; then
+				echo "# Building new package...$OVERWRITE"
 				reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
-				[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 				echo "# Creating Build/Archive Copy..."
 				copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
+
+				if [ -f $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh ]; then
+					echo "# Running post-build hook (project)"
+					$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh
+				else
+					echo "# No post-build hoook found '$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/post-build.sh'"
+				fi
+				if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
+					echo "# Running post-build hook (global)"
+					$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME
+				else
+					echo "# No post-build hoook found '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
+				fi
+
 				echo "# Done building and archiving new version: $VERSION_NAME";
 			else
 				echo "# Archived version '$VERSION_NAME' of package '$PROJECT_NAME' already exists !";
 			fi
 		fi
-		echo "$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh"
-		if [ -f $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh ]; then
-			echo "# Running post-build hook (project)"
-			$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh
-		else
-			echo "# No post-build hoook found '$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/post-build.sh'"
-		fi
-		if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
-			echo "# Running post-build hook (global)"
-			$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME
-		else
-			echo "# No post-build hoook found '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
-		fi
-
-	fi
-
-	#source $BVR_HOME/$PROJECT_NAME/env/$ENV_NAME/servers;
-	#source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
-
-	if ! $ENV_PROVIDED ; then
-		echo "# Missing enviroment paramter. Use -e to specify enviroment"
-		exit 1
 	fi
 
 	if $DEPLOY ; then
+
+		[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
+
+		if ! $ENV_PROVIDED ; then
+			echo "# Missing enviroment paramter. Use -e to specify enviroment"
+			exit 1
+		fi
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		if  ! $USE_ARCHIVE ; then
 			archive_code=$REPO_SOURCE
@@ -161,17 +163,21 @@ if create_lock $LOCK; then
 				rsync -avz --exclude='.svn' --exclude='.git' --exclude-from=$BVR_HOME/sources/$PROJECT_NAME/rsync-exclude --delete -e ssh $archive_code/ $DEST:$remote_path/
 			else
 				echo "Stadard exclude:";
-				#exit;
+				#exit;\
+				echo rsync -avz --exclude='.svn' --exclude='.git' --delete -e ssh $archive_code/ $DEST:$remote_path/
 				rsync -avz --exclude='.svn' --exclude='.git' --delete -e ssh $archive_code/ $DEST:$remote_path/
 			fi
 			echo "Executing remote postdeploy '$ENV_NAME' - '$ENV_NAME_CONFIG'";
-			ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG;"
+			ssh $DEST "cd $remote_path; bash post-deploy.sh $ENV_NAME $ENV_NAME_CONFIG;" || true
 			echo "Done";
 
 		done
 	fi
 
 	if $FLIP ; then
+
+		[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
+
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		remote_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/$VERSION_NAME;
 		current_path=$SERVER_DEPLOY_HOME/$PROJECT_NAME/$ENV_NAME/current
@@ -190,18 +196,29 @@ if create_lock $LOCK; then
 		for DEST in "${SERVERS[@]}"
 		do
 			echo "# Flipping '$DEST' to '$VERSION_NAME'";
-			ssh $DEST "cd $remote_path; bash pre-flip.sh $ENV_NAME";
+			ssh $DEST "cd $remote_path; bash pre-flip.sh $ENV_NAME" || true;
+
 			if [ ! `ssh $DEST test -d $current_path || echo 0` ]; then
 				ssh $DEST "rm $current_path; ln -s $remote_path $current_path";
 			else
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
-			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME";
+			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME" || true;
 		done
 		echo "# Executing deploy server post flip";
-		$BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh $VERSION_NAME;
+		if [ -d $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh ]; then
+			$BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh $VERSION_NAME || true;
+		fi
+		echo "# Flip Completed !"
+
 	fi
+
+
 	if $STATUS ; then
+		if [ -z $ENV_NAME ]; then
+			echo "Missing enviroment. Please specify enviroment using -e";
+			exit 1;
+		fi
 		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
 		for DEST in "${SERVERS[@]}"
 		do
@@ -210,6 +227,8 @@ if create_lock $LOCK; then
 			echo "$DEST => $remote_ver";
 		done
 	fi
+
+
 	if $BUILD -o $DEPLOY -o $FLIP ; then
 		if $BUILD ; then
 			FINAL_MSG="$FINAL_MSG [Build]";
