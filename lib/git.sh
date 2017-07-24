@@ -11,10 +11,9 @@ function reset_source() {
 		git clone $url $dir;
 	fi
 	cd $dir;
-	git pull
+	git fetch
 	git checkout $branch
-	git fetch $url $branch
-	git pull
+	git pull || true
 	if [ ! -z $rev ]; then
 		echo "Revision provided";
 		git reset --hard $rev
