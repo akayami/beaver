@@ -120,7 +120,7 @@ if create_lock $LOCK; then
 		fi
 	fi
 
-	source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers;
+	source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers || true;
 
 	if $DEPLOY ; then
 
