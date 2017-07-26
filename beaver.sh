@@ -205,15 +205,17 @@ if create_lock $LOCK; then
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
 			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME $SERVER_APP_LOCAL_CONFIG" || true;
-			if $SERVER_POST_FLIP_COMMAND ; then
+			# Proper way of testing if variable is set in bash
+			# https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash?page=1&tab=votes#tab-top
+			if [ -z ${var+SERVER_POST_FLIP_COMMAND}  ]; then
 				echo "#Executing Post-Flip Server Command"
-				ssh $DEST $SERVER_POST_FLIP_COMMAND
+				ssh $DEST "$SERVER_POST_FLIP_COMMAND"
 			fi
 		done
 		echo "# Executing deploy server post flip";
 		if [ -d $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh ]; then
 			$BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh $VERSION_NAME || true;
-		fi
+		fi208GG
 		echo "# Flip Completed !"
 
 	fi
