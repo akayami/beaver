@@ -93,16 +93,16 @@ if create_lock $LOCK; then
 			[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 		else
 			echo "# Using archive method";
+			reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
 			[ -z $VERSION_NAME ] && VERSION_NAME=$(get_last_commit_id $REPO_SOURCE);
 			if [ ! -d $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME ] || $OVERWRITE ; then
-				echo "# Building new package...$OVERWRITE"
-				reset_source $REPO_SOURCE $REPO_URL $BRANCH $REVISION;
 				echo "# Creating Build/Archive Copy..."
 				copy_source_to_archive $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME $BRANCH $REVISION
 
 				if [ -f $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh ]; then
 					echo "# Running post-build hook (project)"
-					$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/post-build.sh
+					cd $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/payload/
+					./post-build.sh
 				else
 					echo "# No post-build hoook found '$BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME/post-build.sh'"
 				fi
@@ -204,7 +204,11 @@ if create_lock $LOCK; then
 			else
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
-			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME" || true;
+			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME $SERVER_APP_LOCAL_CONFIG" || true;
+			if $SERVER_POST_FLIP_COMMAND ; then
+				echo "#Executing Post-Flip Server Command"
+				ssh $DEST $SERVER_POST_FLIP_COMMAND
+			fi
 		done
 		echo "# Executing deploy server post flip";
 		if [ -d $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh ]; then
