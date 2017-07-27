@@ -74,6 +74,7 @@ if create_lock $LOCK; then
 
 	if $ARCHIVED ; then
 		print_archives $BVR_ARCHIVE_HOME/$PROJECT_NAME
+		exit 0
 	fi
 
 	if $INFO ; then
@@ -120,7 +121,11 @@ if create_lock $LOCK; then
 		fi
 	fi
 
-	source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers || true;
+	if $DEPLOY || $FLIP || $STATUS ; then
+
+		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers || true;
+
+	fi
 
 	if $DEPLOY ; then
 
@@ -215,7 +220,7 @@ if create_lock $LOCK; then
 		echo "# Executing deploy server post flip";
 		if [ -d $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh ]; then
 			$BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/post-flip.sh $VERSION_NAME || true;
-		fi208GG
+		fi
 		echo "# Flip Completed !"
 
 	fi
