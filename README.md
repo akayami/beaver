@@ -8,7 +8,7 @@ Simple, easy and highly flexible deployment tool in BASH
 
 The process modeled consists of 3 basic steps:
 
-1. Build/Archive: Code retrival form a source (ex. git, svn), preparation and storage of the package.
+1. Build/Archive: Code retrieval form a source (ex. git, svn), preparation and storage of the package.
 2. Deployment: Transfer of the package to a target servers
 3. Flip: Switching of version on target servers
 
@@ -19,7 +19,7 @@ The process modeled consists of 3 basic steps:
 3. Previous versions are left on the server, and a flip can be executed if deployment revert is needed
 4. Allows for abstract versioning. If version is provided it will be used, otherwise, revision number is used.
 5. Deployment process uses rsync. Server side, a copy of previous version in made and it is upgraded using rsync.
-6. The tool should be system agnostic, as long a bash is suppored (that's the general goal anyways).
+6. The tool should be system agnostic, as long a bash is supported (that's the general goal anyways).
 
 ### Usage:
 

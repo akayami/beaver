@@ -109,7 +109,7 @@ if create_lock $LOCK; then
 				fi
 				if [ -f $BVR_HOME/sources/$PROJECT_NAME/post-build.sh ]; then
 					echo "# Running post-build hook (global)"
-					$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME
+					$BVR_HOME/sources/$PROJECT_NAME/post-build.sh $REPO_SOURCE $BVR_ARCHIVE_HOME/$PROJECT_NAME/$VERSION_NAME || true
 				else
 					echo "# No post-build hoook found '$BVR_HOME/sources/$PROJECT_NAME/post-build.sh'"
 				fi
@@ -122,9 +122,15 @@ if create_lock $LOCK; then
 	fi
 
 	if $DEPLOY || $FLIP || $STATUS ; then
-
-		source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers || true;
-
+		if [ "$ENV_NAME" != "" ]; then
+			source $BVR_HOME/servers/$PROJECT_NAME/$ENV_NAME/servers || true;
+			echo $SERVER_DEPLOY_HOME
+		else
+			echo "You need to provide enviroment to execute Deploy, Flip or Status"
+			exit 0
+		fi
+	else
+		echo "# Not Deploying, Flipping or Status checking."
 	fi
 
 	if $DEPLOY ; then
