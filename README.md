@@ -156,3 +156,10 @@ ln -s /home/deploy/apps/beaver/prod/current/beaver.sh
 ```
 
 Now you should be able to run the `beaver.sh` command from you deploy user account.
+
+```
+beaver.sh -p beaver -e prod -b 0.0.3 -v 0.0.3 -B -d -f
+```
+
+Now you should be able to delete the beaver code that is in ~/beaver and only use the global command which references the copy of beaver stored in ~/apps/beaver/prod/current/
+
