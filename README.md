@@ -1,4 +1,4 @@
-Beaver 0.1 - The Eager
+Beaver - The Eager
 ======
 
 Simple, easy and highly flexible deployment tool in BASH
@@ -72,10 +72,87 @@ beaver.sh - This is the main control through which most commands are executed.
 ##### What is deployed on each server
 `beaver.sh -p project -e environment -s`
 
-
-
 #### Tricks:
 1. To know what projects are available: `beaver.sh -p`  
 2. Check archived builds: `beaver.sh -p project -a`
 3. Check deployed version: `beaver.sh -p project -e staging -s`
 4. Display info about a version: `beaver.sh -p project -v version -i`
+
+### Installation
+
+There are multiple ways of installing the script. The following is the way the maintainer recommends setting it up. 
+
+#### The deploy server
+First you need to decide where you want to host beaver. Make sure that the server has enough disk space to hold your builds. It is possible to host beaver on your own machine.
+In either case you should create a dedicated user with it's own home directory. I'll create a user `deploy` on my remote server. Connect to your remote machine using ssh as the newly created deploy user. 
+
+`ssh deploy@my-deploy-machine.local`
+
+In home directory clone beaver:
+
+`git clone https://github.com/akayami/beaver.git`
+
+This will clone beaver's repo into you home.
+Next you will need to create your beaver config files. Currently, beaver expects your files to be in `$HOME/.bvrconfig`. Let's start by copying the sample config file provided in this repo:
+
+```bash
+cd ~
+mkdir ~/.bvrconfig
+cp -r beaver/sample-conf/* ~/.bvrconfig/
+```
+This should give you a starting point. 
+Your config files are located inside `~/.bvrconfig/conf/`. It is a good practive to push the contents of your `~/.bvrconfig/conf/` into a  private git repo so that you can easily edit them and keep track of changes. 
+
+We're going to start by making the Beaver tool deployable by Beaver !
+First, there are two types of confing: 
+`sources` and `servers`
+
+##### Sources
+Sources contain information on where the source-code is. It will usually be a git repo. You can view an example of this file by viewing the source file for beaver:
+
+`cat ~/.bvrconfig/conf/sources/beaver/source`
+
+You should see this self-evident configuration:
+
+```bash
+REPO_TYPE="git"
+REPO_URL="git@github.com:akayami/beaver.git"
+DEFAULT_BRANCH="master"
+```
+
+##### Servers
+Next we shall inspect the server's config file:
+`cat ~/.bvrconfig/conf/servers/beaver/prod/servers`
+
+```
+SERVERS=( deploy@akayami.com  )
+SERVERS_DEPLOY_HOME=/my/apps/home/path
+```
+
+Here you can define where you will be deploying your code, and into which directory. 
+Change the server string in SERVERS to match your server.
+You need to also define a place where beaver shall deploy your code. In this exmaple I'll deploy it to: 
+
+```
+/home/deploy/apps
+```
+
+so my file will look like this:
+```
+SERVERS=( deploy@my-deploy-machine.local  )
+SERVERS_DEPLOY_HOME=/home/deploy/apps
+```
+It is recommended to add your own key to `~/.ssh/authorized_keys` so that you can ssh on yourself without being asked for password. If you do not do this, you will be asked for your password a lot.
+
+Now you should be able to deploy beaver using beaver:
+`~/beaver/beaver.sh -p beaver -e prod -b 0.0.3 -v 0.0.3 -B -d -f`
+
+It will appear in `~/apps/beaver/prod/0.0.3/`. There should also be a symlink called `current` pointing to `0.0.3`. The `current` symlink is how the system knows which version to currently use. 
+
+The last thing to do is to add beaver.sh to your exec path or to create a symlink as follows (root powers needed):
+```bash
+cd /usr/bin
+ln -s /home/deploy/apps/beaver/prod/current/beaver.sh
+```
+
+Now you should be able to run the `beaver.sh` command from you deploy user account.
