@@ -1,2 +1,3 @@
 SERVERS=( deploy@akayami.com  )
-SERVERS_DEPLOY_HOME=/my/apps/home/path
+SERVER_DEPLOY_HOME=/my/apps/home/path
+SERVER_POST_FLIP_COMMAND="ls -al"
