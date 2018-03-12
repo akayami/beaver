@@ -1,4 +1,4 @@
-q#!/bin/bash
+#!/bin/bash
 
 set -o errexit
 #set -o nounset
@@ -216,11 +216,13 @@ if create_lock $LOCK; then
 				ssh $DEST "ln -s $remote_path $current_path";
 			fi
 			ssh $DEST "cd $current_path; bash post-flip.sh $ENV_NAME $SERVER_APP_LOCAL_CONFIG" || true;
-			# Proper way of testing if variable is set in bash
-			# https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash?page=1&tab=votes#tab-top
-			if [ -z ${var+SERVER_POST_FLIP_COMMAND}  ]; then
+
+			if [ -n "$SERVER_POST_FLIP_COMMAND"  ]; then
+			#if [ -z ${var+SERVER_POST_FLIP_COMMAND}  ]; then
 				echo "#Executing Post-Flip Server Command"
 				ssh $DEST "$SERVER_POST_FLIP_COMMAND"
+			else
+				echo "# Skipping Post-Flip Sever Command, SERVER_POST_FLIP_COMMAND not defined in conf/servers/{project}/{env}/servers"
 			fi
 		done
 		echo "# Executing deploy server post flip";
