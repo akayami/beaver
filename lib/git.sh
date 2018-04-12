@@ -64,7 +64,9 @@ function copy_source_to_archive() {
 	branch=$3
 	rev=$4
 	mkdir -p $archive/payload/
-	cp -r $source/* $archive/payload
+	cp -r $source/. $archive/payload
+	rm -rf $archive/payload/.git
+	rm $archive/payload/.gitignore
 	if [ -f $archive/payload/post-checkout.sh ]; then
 		echo "# Executing post checkout";
 		local old=`pwd`;
